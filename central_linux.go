@@ -28,7 +28,7 @@ type central struct {
 func newCentral(a *attrRange, addr net.HardwareAddr, l2conn io.ReadWriteCloser) *central {
 	return &central{
 		attrs:       a,
-		mtu:         23,
+		mtu:         128,
 		addr:        addr,
 		security:    securityLow,
 		l2conn:      l2conn,
