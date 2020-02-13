@@ -63,7 +63,7 @@ func NewHCI(devID int, chk bool, maxConn int) (*HCI, error) {
 		plistmu: &sync.Mutex{},
 
 		bufCnt:  make(chan struct{}, 15-1),
-		bufSize: 27,
+		bufSize: 4091,
 
 		maxConn: maxConn,
 		connsmu: &sync.Mutex{},
