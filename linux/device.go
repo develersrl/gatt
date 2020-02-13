@@ -2,6 +2,7 @@ package linux
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"sync"
 	"syscall"
@@ -21,6 +22,9 @@ type device struct {
 
 func newDevice(n int, chk bool) (*device, error) {
 	fd, err := socket.Socket(socket.AF_BLUETOOTH, syscall.SOCK_RAW, socket.BTPROTO_HCI)
+
+	fmt.Printf("newDevice: %v %v\n", fd, err)
+
 	if err != nil {
 		return nil, err
 	}
