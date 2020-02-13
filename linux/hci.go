@@ -172,6 +172,9 @@ func (h *HCI) mainLoop() {
 		}
 		p := make([]byte, n)
 		copy(p, b)
+
+		fmt.Println(p)
+
 		h.handlePacket(p)
 	}
 }
