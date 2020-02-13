@@ -61,6 +61,7 @@ func newSocket(fd, n int, chk bool) (*device, error) {
 	log.Printf("dev: %s up", name)
 	if err := gioctl.Ioctl(uintptr(fd), hciUpDevice, uintptr(n)); err != nil {
 		if err != syscall.EALREADY {
+			fmt.Printf("hciUpDevice: %v\n", err)
 			return nil, err
 		}
 		log.Printf("dev: %s reset", name)
