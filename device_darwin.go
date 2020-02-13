@@ -68,6 +68,10 @@ func NewDevice(opts ...Option) (Device, error) {
 	return d, nil
 }
 
+func (d *device) Stop() error {
+	return nil
+}
+
 func (d *device) Init(f func(Device, State)) error {
 	go d.loop()
 	rsp := d.sendReq(1, xpc.Dict{
