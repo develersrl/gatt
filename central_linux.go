@@ -2,6 +2,7 @@ package gatt
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 	"net"
 	"sync"
@@ -28,7 +29,7 @@ type central struct {
 func newCentral(a *attrRange, addr net.HardwareAddr, l2conn io.ReadWriteCloser) *central {
 	return &central{
 		attrs:       a,
-		mtu:         128,
+		mtu:         23,
 		addr:        addr,
 		security:    securityLow,
 		l2conn:      l2conn,
@@ -102,6 +103,9 @@ func (c *central) handleReq(b []byte) []byte {
 
 func (c *central) handleMTU(b []byte) []byte {
 	c.mtu = binary.LittleEndian.Uint16(b[:2])
+
+	fmt.Println("central handleMTU: %v\n", c.mtu)
+
 	if c.mtu < 23 {
 		c.mtu = 23
 	}
