@@ -89,9 +89,11 @@ func Bind(fd int, sa Sockaddr) (err error) {
 		return err
 	}
 	for i := 0; i < 5; i++ {
+		//fmt.Printf("bind(fd=%v, ptr=%v, n=%v)\n", fd, ptr, n)
 		if err = bind(fd, ptr, n); err == nil || err != syscall.EBUSY {
 			return err
 		}
+		//fmt.Printf("err: %v\n", err)
 		time.Sleep(time.Second)
 	}
 	return ErrSocketBindTimeout

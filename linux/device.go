@@ -33,9 +33,13 @@ func newDevice(n int, chk bool) (*device, error) {
 	}
 
 	req := devListRequest{devNum: hciMaxDevices}
-	if err := gioctl.Ioctl(uintptr(fd), hciGetDeviceList, uintptr(unsafe.Pointer(&req))); err != nil {
+	fmt.Printf("LA MARZOCCO - gioctl.Ioctl(uintptr(fd)=%v, hciGetDeviceList, uintptr(unsafe.Pointer(&req)))\n", uintptr(fd))
+	err = gioctl.Ioctl(uintptr(fd), hciGetDeviceList, uintptr(unsafe.Pointer(&req)))
+	fmt.Printf("LA MARZOCCO - err=%v\n", err)
+	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("LA MARZOCCO - int(req.devNum)=%v\n", int(req.devNum))
 	for i := 0; i < int(req.devNum); i++ {
 		d, err := newSocket(fd, i, chk)
 		if err == nil {
