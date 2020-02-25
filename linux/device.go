@@ -21,9 +21,9 @@ type device struct {
 }
 
 func newDevice(n int, chk bool) (*device, error) {
+	fmt.Printf("LA MARZOCCO - socket.Socket(socket.AF_BLUETOOTH, syscall.SOCK_RAW, socket.BTPROTO_HCI)\n")
 	fd, err := socket.Socket(socket.AF_BLUETOOTH, syscall.SOCK_RAW, socket.BTPROTO_HCI)
-
-	fmt.Printf("newDevice: %v %v\n", fd, err)
+	fmt.Printf("LA MARZOCCO - fd=%v, err=%v\n", fd, err)
 
 	if err != nil {
 		return nil, err
@@ -48,7 +48,12 @@ func newDevice(n int, chk bool) (*device, error) {
 
 func newSocket(fd, n int, chk bool) (*device, error) {
 	i := hciDevInfo{id: uint16(n)}
-	if err := gioctl.Ioctl(uintptr(fd), hciGetDeviceInfo, uintptr(unsafe.Pointer(&i))); err != nil {
+
+	fmt.Printf("LA MARZOCCO - gioctl.Ioctl(uintptr(fd)=%v, hciGetDeviceInfo, uintptr(unsafe.Pointer(&i)))\n", uintptr(fd))
+	err := gioctl.Ioctl(uintptr(fd), hciGetDeviceInfo, uintptr(unsafe.Pointer(&i)))
+	fmt.Printf("LA MARZOCCO - err=%v\n", err)
+
+	if err != nil {
 		return nil, err
 	}
 	name := string(i.name[:])
@@ -59,32 +64,47 @@ func newSocket(fd, n int, chk bool) (*device, error) {
 		return nil, err
 	}
 	log.Printf("dev: %s up", name)
-	fmt.Printf("ioctl arguments: %v uintptr(%v) %v uintptr(%v)\n", fd, uintptr(fd), n, uintptr(n))
-	if err := gioctl.Ioctl(uintptr(fd), hciUpDevice, uintptr(n)); err != nil {
+	fmt.Printf("LA MARZOCCO - gioctl.Ioctl(uintptr(fd)=%v, hciUpDevice, uintptr(n)=%v)\n", uintptr(fd), uintptr(n))
+	err = gioctl.Ioctl(uintptr(fd), hciUpDevice, uintptr(n))
+	fmt.Printf("LA MARZOCCO - err=%v\n", err)
+	if err != nil {
 		if err != syscall.EALREADY {
-			fmt.Printf("hciUpDevice: %v\n", err)
 			return nil, err
 		}
 		log.Printf("dev: %s reset", name)
-		if err := gioctl.Ioctl(uintptr(fd), hciResetDevice, uintptr(n)); err != nil {
+		fmt.Printf("LA MARZOCCO - gioctl.Ioctl(uintptr(fd)=%v, hciResetDevice, uintptr(n)=%v)\n", uintptr(fd), uintptr(n))
+		err = gioctl.Ioctl(uintptr(fd), hciResetDevice, uintptr(n))
+		fmt.Printf("LA MARZOCCO - err=%v\n", err)
+		if err != nil {
 			return nil, err
 		}
 	}
 	log.Printf("dev: %s down", name)
-	if err := gioctl.Ioctl(uintptr(fd), hciDownDevice, uintptr(n)); err != nil {
+	fmt.Printf("LA MARZOCCO - gioctl.Ioctl(uintptr(fd)=%v, hciDownDevice, uintptr(n)=%v)\n", uintptr(fd), uintptr(n))
+	err = gioctl.Ioctl(uintptr(fd), hciDownDevice, uintptr(n))
+	fmt.Printf("LA MARZOCCO - err=%v\n", err)
+	if err != nil {
 		return nil, err
 	}
 
 	// Attempt to use the linux 3.14 feature, if this fails with EINVAL fall back to raw access
 	// on older kernels.
 	sa := socket.SockaddrHCI{Dev: n, Channel: socket.HCI_CHANNEL_USER}
-	if err := socket.Bind(fd, &sa); err != nil {
+	fmt.Printf("sa := socket.SockaddrHCI{Dev: %v, Channel: socket.HCI_CHANNEL_USER}", n)
+	fmt.Printf("LA MARZOCCO - socket.Bind(fd=%v, &sa)\n", fd)
+	err = socket.Bind(fd, &sa)
+	fmt.Printf("LA MARZOCCO - err=%v\n", err)
+	if err != nil {
 		if err != syscall.EINVAL {
 			return nil, err
 		}
 		log.Printf("dev: %s can't bind to hci user channel, err: %s.", name, err)
 		sa := socket.SockaddrHCI{Dev: n, Channel: socket.HCI_CHANNEL_RAW}
-		if err := socket.Bind(fd, &sa); err != nil {
+		fmt.Printf("sa := socket.SockaddrHCI{Dev: %v, Channel: socket.HCI_CHANNEL_RAW}", n)
+		fmt.Printf("LA MARZOCCO - socket.Bind(fd=%v, &sa)\n", fd)
+		err = socket.Bind(fd, &sa)
+		fmt.Printf("LA MARZOCCO - err=%v\n", err)
+		if err != nil {
 			log.Printf("dev: %s can't bind to hci raw channel, err: %s.", name, err)
 			return nil, err
 		}
