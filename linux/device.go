@@ -101,15 +101,24 @@ func newSocket(fd, n int, chk bool) (*device, error) {
 func (d device) Read(b []byte) (int, error) {
 	d.rmu.Lock()
 	defer d.rmu.Unlock()
-	return syscall.Read(d.fd, b)
+	fmt.Printf("syscall.Read(d.fd=%v, b=%v)\n", d.fd, b)
+	n, err := syscall.Read(d.fd, b)
+	fmt.Printf("n=%v err=%v\n", n, err)
+	return n, err
 }
 
 func (d device) Write(b []byte) (int, error) {
 	d.wmu.Lock()
 	defer d.wmu.Unlock()
-	return syscall.Write(d.fd, b)
+	fmt.Printf("syscall.Write(d.fd=%v, b=%v)\n", d.fd, b)
+	n, err := syscall.Write(d.fd, b)
+	fmt.Printf("n=%v err=%v\n", n, err)
+	return n, err
 }
 
 func (d device) Close() error {
-	return syscall.Close(d.fd)
+	fmt.Printf("syscall.Close(d.fd=%v)\n", d.fd)
+	err := syscall.Close(d.fd)
+	fmt.Printf("err=%v\n", err)
+	return err
 }

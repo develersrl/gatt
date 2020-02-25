@@ -7,6 +7,7 @@ package socket
 
 import (
 	"errors"
+	"fmt"
 	"syscall"
 	"time"
 	"unsafe"
@@ -71,9 +72,12 @@ func (sa *SockaddrHCI) sockaddr() (unsafe.Pointer, _Socklen, error) {
 
 func Socket(domain, typ, proto int) (int, error) {
 	for i := 0; i < 5; i++ {
-		if fd, err := syscall.Socket(domain, typ, proto); err == nil || err != syscall.EBUSY {
+		fmt.Printf("syscall.Socket(domain=%v, typ=%v, proto=%v)\n", domain, typ, proto)
+		fd, err := syscall.Socket(domain, typ, proto)
+		if err == nil || err != syscall.EBUSY {
 			return fd, err
 		}
+		fmt.Printf("err: %v\n", err)
 		time.Sleep(time.Second)
 	}
 	return 0, ErrSocketOpenFailed

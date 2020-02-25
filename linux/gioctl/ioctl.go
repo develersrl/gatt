@@ -1,6 +1,9 @@
 package gioctl
 
-import "syscall"
+import (
+	"fmt"
+	"syscall"
+)
 
 const (
 	typeBits      = 8
@@ -49,9 +52,12 @@ func IoRW(t, nr, size uintptr) uintptr {
 
 // Ioctl simplified ioct call
 func Ioctl(fd, op, arg uintptr) error {
+	fmt.Printf("syscall.Syscall(syscall.SYS_IOCTL, fd=%v, op=%v, arg=%v)\n", fd, op, arg)
 	_, _, ep := syscall.Syscall(syscall.SYS_IOCTL, fd, op, arg)
 	if ep != 0 {
+		fmt.Printf("syscall.Errno(ep)=%v\n", syscall.Errno(ep))
 		return syscall.Errno(ep)
 	}
+	fmt.Println("ep=0")
 	return nil
 }
